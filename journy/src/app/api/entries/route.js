@@ -63,8 +63,11 @@ export async function POST(req) {
         5. "suggestions" – Give 2–3 personalized, actionable suggestions to improve wellbeing, build on positive habits, or address challenges. Keep them simple, practical, and encouraging. in case of any severe issues that may require professional help, suggest seeking support from a mental health professional with proper disclaimer.
 
          Always respond ONLY in a valid JSON format with these exact keys: "summary", "mood", "habits_and_patterns", "concerns", "suggestions".
+         make the analysis details in a structured bullet point format wherever possible.so that it can be easily displayed in the app.  
 
           Journal Entry:
+
+          
 
         ${entryText}
         `;
