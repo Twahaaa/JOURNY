@@ -15,16 +15,16 @@
     "lucide-react": "^0.544.0",
     "mongoose": "^8.18.2",
     "next": "15.5.3",
+    "openai": "^5.22.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "daisyui": "^5.1.14",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "prisma": "^6.16.2",
     "tailwindcss": "^4"
-  },
-  "browserslist": "> 1%"
+  }
 }
