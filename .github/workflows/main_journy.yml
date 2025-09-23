@@ -24,6 +24,15 @@ jobs:
           node-version: '22.x'
 
       - name: npm install, build, and test
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          OPEN_AI_ENDPOINT: ${{ secrets.OPEN_AI_ENDPOINT }}
+          OPEN_AI_MODEL: ${{ secrets.OPEN_AI_MODEL }}
+          OPEN_AI_DEPLOYMENT_NAME: ${{ secrets.OPEN_AI_DEPLOYMENT_NAME }}
+          OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+        working-directory: ./journy
         run: |
           npm install
           npm run build --if-present
@@ -62,4 +71,5 @@ jobs:
           app-name: 'journy'
           slot-name: 'Production'
           package: .
+
           
