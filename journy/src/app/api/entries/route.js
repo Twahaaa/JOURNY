@@ -44,15 +44,32 @@ export async function POST(req) {
       // status is set by default in the model
     });
 
-    const prompt = `Analyze the following journal entry and provide a report. The report should include:
-    - A summary of the entry.
-    - An analysis of the mood or sentiment.
-    - Suggestions for improvement or reflection.
-    Return the result in a clean JSON format with keys: "summary", "mood", and "suggestions".
+    const prompt = `
+        Analyze the following journal entry and return a JSON object with the following keys:
 
-    Journal Entry:
-    ${entryText}
-    `;
+        1. "summary" – A concise summary of the journal entry, highlighting important events, emotions, and activities. Keep it under 5 sentences.
+
+        2. "mood" – Identify the user's overall mood and emotional tone. Include:
+        - main emotional state (e.g., anxious, content, frustrated, motivated),
+        - contributing factors (events, habits, interactions),
+        - intensity (low, medium, high).
+
+        3. "habits_and_patterns" – Detect any recurring behaviors, lifestyle habits, or potential patterns that influence mental health. For example: 
+        - poor sleep hygiene (late-night phone use, difficulty sleeping),
+        - excessive screen time,
+        - lack of social interaction,
+        - irregular meals,
+        - positive habits (exercise, journaling, gratitude, social connection).
+
+        4. "concerns" – Highlight potential warning signs for wellbeing (e.g., prolonged sadness, signs of stress, difficulty focusing, isolation). Do not diagnose. Phrase concerns gently.
+
+        5. "suggestions" – Give 2–3 personalized, actionable suggestions to improve wellbeing, build on positive habits, or address challenges. Keep them simple, practical, and encouraging.
+
+        Always respond ONLY in a valid JSON format with these exact keys: "summary", "mood", "habits_and_patterns", "concerns", "suggestions".
+
+        Journal Entry:
+        ${entryText}
+        `;
 
     const result = await client.chat.completions.create({
       messages: [
@@ -71,13 +88,13 @@ export async function POST(req) {
     });
 
     const analysisText = result.choices[0]?.message?.content;
-    
+
     if (!analysisText) {
       throw new Error("Received an empty analysis from the AI model.");
     }
 
     const analysisObject = JSON.parse(analysisText);
-    
+
     // Update the record using Mongoose's findByIdAndUpdate
     const updatedEntry = await JournalEntry.findByIdAndUpdate(
       initialEntry._id, // Mongoose uses _id for the primary key
@@ -98,7 +115,10 @@ export async function POST(req) {
     const errorStatus = error.status || 500;
 
     return new NextResponse(
-      JSON.stringify({ error: "Failed to analyze entry.", details: errorMessage }),
+      JSON.stringify({
+        error: "Failed to analyze entry.",
+        details: errorMessage,
+      }),
       {
         status: errorStatus,
         headers: { "Content-Type": "application/json" },
@@ -108,90 +128,94 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
-    const { userId } = await auth();
-  
-    if (!userId) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-  
-    try {
-      // Connect to the database
-      await connectToDb();
-  
-      // Fetch all entries for the user. Sorting is done in the app layer
-      // as a workaround for the Cosmos DB indexing error.
-      const unsorted_entries = await JournalEntry.find({ userId: userId });
-  
-      // Manually sort the entries by date in descending order.
-      const all_entries = unsorted_entries.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-  
-      return NextResponse.json(all_entries);
-    } catch (error) {
-      console.error("Error fetching entries:", error);
-      return new NextResponse(
-        JSON.stringify({ error: "Failed to fetch entries." }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-  }
-  
+  const { userId } = await auth();
 
-  export async function DELETE(req) {
-    const { userId } = await auth();
-  
-    if (!userId) {
-      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+  if (!userId) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    // Connect to the database
+    await connectToDb();
+
+    // Fetch all entries for the user. Sorting is done in the app layer
+    // as a workaround for the Cosmos DB indexing error.
+    const unsorted_entries = await JournalEntry.find({ userId: userId });
+
+    // Manually sort the entries by date in descending order.
+    const all_entries = unsorted_entries.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    return NextResponse.json(all_entries);
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to fetch entries." }),
+      {
+        status: 500,
         headers: { "Content-Type": "application/json" },
-      });
-    }
-  
-    try {
-      const { searchParams } = new URL(req.url);
-      const entryId = searchParams.get('id');
-  
-      if (!entryId) {
-        return new NextResponse(JSON.stringify({ error: "Entry ID is required" }), {
+      }
+    );
+  }
+}
+
+export async function DELETE(req) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const entryId = searchParams.get("id");
+
+    if (!entryId) {
+      return new NextResponse(
+        JSON.stringify({ error: "Entry ID is required" }),
+        {
           status: 400,
           headers: { "Content-Type": "application/json" },
-        });
-      }
-  
-      await connectToDb();
-  
-      const deletedEntry = await JournalEntry.findOneAndDelete({
-        _id: entryId,
-        userId: userId,
-      });
-  
-      if (!deletedEntry) {
-        return new NextResponse(
-          JSON.stringify({ error: "Entry not found or user not authorized" }),
-          {
-            status: 404,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-      }
-  
-      return NextResponse.json({ message: "Entry deleted successfully", id: deletedEntry._id });
-    } catch (error) {
-      console.error("Error deleting entry:", error);
+        }
+      );
+    }
+
+    await connectToDb();
+
+    const deletedEntry = await JournalEntry.findOneAndDelete({
+      _id: entryId,
+      userId: userId,
+    });
+
+    if (!deletedEntry) {
       return new NextResponse(
-        JSON.stringify({ error: "Failed to delete entry" }),
+        JSON.stringify({ error: "Entry not found or user not authorized" }),
         {
-          status: 500,
+          status: 404,
           headers: { "Content-Type": "application/json" },
         }
       );
     }
+
+    return NextResponse.json({
+      message: "Entry deleted successfully",
+      id: deletedEntry._id,
+    });
+  } catch (error) {
+    console.error("Error deleting entry:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to delete entry" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
-  
+}

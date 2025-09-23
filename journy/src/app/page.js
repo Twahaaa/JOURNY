@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -7,15 +8,15 @@ export default function HomePage() {
       <header className="sticky top-0 z-40 backdrop-blur bg-base-100/80 border-b border-base-200">
         <nav className="navbar max-w-6xl mx-auto px-4">
           <div className="flex-1">
-            <a href="#home" className="btn btn-ghost px-0 text-xl font-semibold text-balance">
+            <Link href="#home" className="btn btn-ghost px-0 text-xl font-semibold text-balance">
               JOURNY
               <span className="sr-only">JOURNY</span>
-            </a>
+            </Link>
           </div>
           <div className="flex-none gap-2">
-            <a href="#cta" className="btn btn-primary">
+            <Link href="/sign-up" className="btn btn-primary">
               Get started
-            </a>
+            </Link>
           </div>
         </nav>
       </header>
@@ -31,9 +32,9 @@ export default function HomePage() {
               they ever touch our database—only you hold the keys.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href="#cta" className="btn btn-primary">
+              <Link href="/sign-up" className="btn btn-primary">
                 Start journaling
-              </a>
+              </Link>
               <a href="#security" className="btn btn-outline">
                 How encryption works
               </a>
@@ -274,10 +275,10 @@ export default function HomePage() {
             <h3 className="card-title text-2xl md:text-3xl">Start your private journal today</h3>
             <p className="opacity-80">Create a space that’s truly yours—secure, calming, and always in your control.</p>
             <div className="card-actions">
-              <a className="btn btn-primary">Create my account</a>
-              <a className="btn btn-outline" href="#security">
+              <Link className="btn btn-primary" href="/sign-up">Create my account</Link>
+              <Link className="btn btn-outline" href="#security">
                 Learn about security
-              </a>
+              </Link>
             </div>
           </div>
         </div>

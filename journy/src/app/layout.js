@@ -18,12 +18,10 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: [dark, neobrutalism],
+        baseTheme: [ dark ],
         variables: { 
           colorPrimary: '',
           colorForeground: 'white',
-          colorMutedForeground: 'yellow',
-          colorPrimaryForeground: 'yellow'
         },
       }}
     >
