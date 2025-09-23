@@ -187,7 +187,7 @@ export default function InsightsPage() {
         AI Analysis
       </h2>
       <p className="text-base-content/70 text-lg max-w-2xl mx-auto">
-        Here&apos;s what our AI discovered about your journal entry
+        Here&apos;s are some insights discovered from your journal entry
       </p>
     </div>
 
