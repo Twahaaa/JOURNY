@@ -260,7 +260,7 @@ export default function DashboardPage() {
                     Your daily reflection
                   </h2>
                   <div className="flex items-center gap-2">
-                    <div className="badge badge-outline rounded-4xl badge-sm gap-1 py-[17px] px-3">
+                    {/* <div className="badge badge-outline rounded-4xl badge-sm gap-1 py-[17px] px-3">
                       {entry.length} characters
                     </div>
                     <button
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                       onClick={saveEntry}
                     >
                       <Check className="h-4 w-4" /> Save
-                    </button>
+                    </button> */}
                     <button
                       className="btn btn-accent py-4 flex rounded-4xl items-center gap-1"
                       onClick={analyzeEntry}
@@ -302,12 +302,12 @@ export default function DashboardPage() {
                     Autosaving locally as you type. Private to this device.
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
+                    {/* <button
                       className="btn btn-outline btn-sm flex items-center gap-1"
                       onClick={() => window.location.reload()}
                     >
                       <RefreshCw className="h-4 w-4" /> Refresh
-                    </button>
+                    </button> */}
                     <button
                       className="btn btn-outline btn-sm flex items-center gap-1"
                       onClick={() => {
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                     >
                       <Copy className="w-4 h-4" /> Copy
                     </button>
-                    <button
+                    {/* <button
                       className="btn btn-outline btn-sm flex items-center gap-1"
                       onClick={() => {
                         const element = document.createElement("a");
@@ -335,7 +335,7 @@ export default function DashboardPage() {
                       }}
                     >
                       <Download className="h-4 w-4" /> Download
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
