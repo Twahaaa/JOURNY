@@ -31,7 +31,7 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
-        working-directory: ./JOURNY # Assuming your subfolder is named 'JOURNY' based on the error log
+        working-directory: ./journy # Assuming your subfolder is named 'JOURNY' based on the error log
 
       # --- CHANGE #2: UPDATED ARTIFACT PATH ---
       # This ensures that only the contents of your application folder are
@@ -69,3 +69,4 @@ jobs:
           app-name: 'jouny'
           slot-name: 'Production'
           package: .
+
