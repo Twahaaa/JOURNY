@@ -119,7 +119,7 @@ export default function InsightsPage() {
   }
 
   return (
-    <main data-theme="sunset" className="min-h-screen bg-base-100">
+    <main data-theme="luxury" className="min-h-screen bg-base-100">
       <div className="border-b border-base-300">
         <div className="mx-auto max-w-5xl px-6 py-6">
           <button

@@ -47,7 +47,7 @@ export default function HistoryPage() {
 
   return (
     <main
-      data-theme="sunset"
+      data-theme="luxury"
       className="min-h-screen bg-gradient-to-br from-base-200 to-base-300 text-base-content"
     >
       <div className="mx-auto max-w-7xl px-4 py-6 md:py-10">

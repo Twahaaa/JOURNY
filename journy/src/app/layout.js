@@ -3,6 +3,8 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark, neobrutalism } from "@clerk/themes";
 import UserProfile from "@/components/UserProfile";
+import NavigationSidebar from '../components/sidebar';
+import SidebarWrapper from "@/components/SidebarWrapper";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -19,20 +21,17 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: [ dark ],
-        variables: { 
+        baseTheme: [dark],
+        variables: {
           colorPrimary: '',
           colorForeground: 'white',
         },
       }}
     >
-       <html lang="en" data-theme="luxury">
-        <body
-          data-theme="luxury"
-          className={`${barlow.variable} antialiased lg:flex min-h-screen`}
-        >
-          <UserProfile /> 
-          <main className="flex-1">{children}</main>
+      <html lang="en" data-theme="luxury">
+        <body className={`${barlow.variable} antialiased `}>
+          <SidebarWrapper>{children}</SidebarWrapper>
+          <UserProfile />
         </body>
       </html>
     </ClerkProvider>
