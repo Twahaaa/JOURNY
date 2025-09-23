@@ -45,9 +45,28 @@ export async function POST(req) {
 
     const prompt = `
         Analyze the following journal entry and return a JSON object with the following keys:
-        1. "summary", 2. "mood", 3. "habits_and_patterns", 4. "concerns", 5. "suggestions".
-        Always respond ONLY in a valid JSON format with these exact keys.
-        Journal Entry: ${entryText}
+
+        1. "summary" – A concise summary of the journal entry, highlighting important events, emotions, and activities. Keep it under 5 sentences.
+
+         2. "mood" – Identify the user's overall mood and emotional tone. just give a brief one or two word description if possible
+
+        3. "habits_and_patterns" – Detect any recurring behaviors, lifestyle habits, or potential patterns that influence mental health. For example: 
+          - poor sleep hygiene (late-night phone use, difficulty sleeping),
+          - excessive screen time,
+          - lack of social interaction,
+          - irregular meals,
+          - positive habits (exercise, journaling, gratitude, social connection).
+          - look for any other patterns that may be relevant to mental health.
+
+        4. "concerns" – Highlight potential warning signs for wellbeing (e.g., prolonged sadness, signs of stress, difficulty focusing, isolation). Do not diagnose. Phrase concerns gently.
+
+        5. "suggestions" – Give 2–3 personalized, actionable suggestions to improve wellbeing, build on positive habits, or address challenges. Keep them simple, practical, and encouraging. in case of any severe issues that may require professional help, suggest seeking support from a mental health professional with proper disclaimer.
+
+         Always respond ONLY in a valid JSON format with these exact keys: "summary", "mood", "habits_and_patterns", "concerns", "suggestions".
+
+          Journal Entry:
+
+        ${entryText}
         `;
 
     const result = await client.chat.completions.create({
@@ -55,7 +74,7 @@ export async function POST(req) {
         {
           role: "system",
           content:
-            "You are a journaling analysis assistant. Always respond ONLY in a valid JSON object with the keys: summary, mood, habits_and_patterns, concerns, and suggestions.",
+            "You are a journaling analysis assistant responsible for analyisng journal entries. Always respond ONLY in a valid JSON object with the keys: summary, mood, habits_and_patterns, concerns, and suggestions.",
         },
         {
           role: "user",
