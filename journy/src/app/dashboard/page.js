@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, RefreshCw, Copy, Download } from "lucide-react";
+import { Check, RefreshCw, Copy, Download, Brain, Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
   const today = useMemo(() => new Date(), []);
@@ -22,6 +22,12 @@ export default function DashboardPage() {
   const [savedAt, setSavedAt] = useState(null);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [totalEntries, setTotalEntries] = useState(0);
+
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisError, setAnalysisError] = useState(null);
+  const containerRef = useRef(null);
 
   // This effect now runs only ONCE when the component mounts to load initial data.
   useEffect(() => {
@@ -65,7 +71,76 @@ export default function DashboardPage() {
     } catch {}
   };
 
-  // This effect handles autosaving and is correct.
+
+  const analyzeEntry = async () => {
+    if (!entry.trim()) {
+      alert("Please write something before analyzing!");
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setAnalysisResult(null);
+    setAnalysisError(null);
+
+    try {
+      console.log('Sending request with entry:', entry.trim());
+      
+      const response = await fetch('/api/analyze-entry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          entryText: entry.trim()
+        }),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      // Get the raw response text first
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      // Check if response is empty
+      if (!responseText) {
+        throw new Error('Empty response from server');
+      }
+
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Response text that failed to parse:', responseText);
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || `Server error: ${response.status}`);
+      }
+
+      console.log('Parsed data:', data);
+
+      if (!data.report) {
+        throw new Error('No report data in response');
+      }
+
+      setAnalysisResult(data.report);
+      setShowAnalysis(true);
+      
+      // Save to localStorage as well
+      saveEntry();
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      setAnalysisError(error.message);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   useEffect(() => {
     const id = setTimeout(() => {
       // Avoid saving an empty string unnecessarily on initial load
@@ -150,7 +225,12 @@ export default function DashboardPage() {
                     onClick={() => {
                       if (confirm("Clear today's entry?")) {
                         setEntry("");
-                        // We don't need to manually clear the textarea. React does it.
+
+                        setAnalysisResult(null);
+                        setShowAnalysis(false);
+                        setAnalysisError(null);
+                        if (containerRef.current)
+                          containerRef.current.innerText = "";
                         try {
                           localStorage.removeItem(todayKey);
                           computeStats();
@@ -184,10 +264,22 @@ export default function DashboardPage() {
                       {entry.length} characters
                     </div>
                     <button
-                      className="btn btn-secondary btn-outline py-4 flex rounded-4xl items-center gap-1 "
+                      className="btn btn-secondary btn-outline py-4 flex rounded-4xl items-center gap-1"
                       onClick={saveEntry}
                     >
-                      <Check className="h-4 w-4" /> Submit
+                      <Check className="h-4 w-4" /> Save
+                    </button>
+                    <button
+                      className="btn btn-accent py-4 flex rounded-4xl items-center gap-1"
+                      onClick={analyzeEntry}
+                      disabled={isAnalyzing || !entry.trim()}
+                    >
+                      {isAnalyzing ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Brain className="h-4 w-4" />
+                      )}
+                      {isAnalyzing ? "Analyzing..." : "Analyze"}
                     </button>
                   </div>
                 </div>
@@ -195,7 +287,7 @@ export default function DashboardPage() {
                   // No ref is needed now for setting text
                   value={entry}
                   onChange={(e) => setEntry(e.target.value)}
-                  className="w-full h-96 resize-none text-base leading-7 border-none outline-none focus:outline-none focus:ring-0 text-gray-400 p-4 rounded-lg bg-gray-600/20"
+                  className="w-full h-96 resize-none text-base leading-7 border-none outline-none focus:outline-none focus:ring-0 text-base-content p-4 rounded-lg bg-base-200/50"
                   placeholder="Start writing your thoughts... What made today special? How are you feeling? What are you grateful for?"
                   aria-label="Daily journal entry"
                   style={{
@@ -203,7 +295,6 @@ export default function DashboardPage() {
                     backgroundAttachment: 'local',
                   }}
                 />
-
 
                 <div className="flex items-center justify-between mt-4">
                   <div className="text-xs text-base-content/60 flex items-center gap-1">
@@ -249,6 +340,85 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Error Display */}
+            {analysisError && (
+              <div className="alert alert-error mt-6">
+                <div>
+                  <h3 className="font-bold">Analysis Failed</h3>
+                  <div className="text-xs">{analysisError}</div>
+                </div>
+                <button 
+                  className="btn btn-sm btn-ghost"
+                  onClick={() => setAnalysisError(null)}
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Analysis Results */}
+            {showAnalysis && analysisResult && (
+              <div className="card bg-base-100 shadow-xl mt-6">
+                <div className="card-body">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="card-title text-xl">
+                      <Brain className="w-6 h-6 text-accent" />
+                      AI Analysis
+                    </h2>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setShowAnalysis(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Summary */}
+                    {analysisResult.summary && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2 text-accent">Summary</h3>
+                        <p className="text-base-content/80 leading-relaxed">
+                          {analysisResult.summary}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Mood */}
+                    {analysisResult.mood && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2 text-accent">Mood Analysis</h3>
+                        <div className="badge badge-secondary badge-lg">
+                          {analysisResult.mood}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Suggestions */}
+                    {analysisResult.suggestions && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 text-accent">Suggestions</h3>
+                        <div className="space-y-2">
+                          {Array.isArray(analysisResult.suggestions) ? (
+                            analysisResult.suggestions.map((suggestion, index) => (
+                              <div key={index} className="flex items-start gap-3 p-3 bg-base-200 rounded-lg">
+                                <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0 mt-2"></div>
+                                <span className="text-sm">{suggestion}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-3 bg-base-200 rounded-lg">
+                              <span className="text-sm">{analysisResult.suggestions}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         </div>
       </div>
