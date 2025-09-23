@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import connectToDb from "../../../../lib/mongoose"; // <-- Import Mongoose connection
 import JournalEntry from "../../../../models/JournalEntry"; // <-- Import Mongoose model
+import mongoose from "mongoose";
 
 // POST function remains the same
 export async function POST(req) {
@@ -123,6 +124,13 @@ export async function GET(req) {
 
     // If an ID is provided, fetch a single entry
     if (entryId) {
+      if (!mongoose.Types.ObjectId.isValid(entryId)) {
+        return new NextResponse(
+          JSON.stringify({ error: "Invalid entry id format" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
       const entry = await JournalEntry.findOne({ _id: entryId, userId: userId });
 
       if (!entry) {

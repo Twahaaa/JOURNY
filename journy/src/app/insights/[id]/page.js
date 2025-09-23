@@ -14,7 +14,7 @@ export default function InsightsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const resEntry = await fetch(`/api/entries/${params.id}`)
+        const resEntry = await fetch(`/api/entries?id=${params.id}`)
         console.log(params.id)
         if (!resEntry.ok) throw new Error("Failed to fetch entry")
         const entryData = await resEntry.json()
