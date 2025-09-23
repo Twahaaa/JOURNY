@@ -1,7 +1,7 @@
 import { Barlow } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { dark, neobrutalism } from "@clerk/themes";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -18,7 +18,13 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: [dark], 
+        baseTheme: [dark, neobrutalism],
+        variables: { 
+          colorPrimary: '',
+          colorForeground: 'white',
+          colorMutedForeground: 'yellow',
+          colorPrimaryForeground: 'yellow'
+        },
       }}
     >
       <html lang="en" data-theme="luxury">
