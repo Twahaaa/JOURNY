@@ -179,56 +179,73 @@ export default function InsightsPage() {
           </div>
         </div>
 
-        {/* Analysis Section */}
-        {analysis && (
-          <div>
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold text-base-content mb-4">
-                AI Analysis
-              </h2>
-              <p className="text-base-content/70 text-lg max-w-2xl mx-auto">
-                Here&apos;s what our AI discovered about your journal entry
-              </p>
+{/* Analysis Section */}
+{analysis && (
+  <div>
+    <div className="text-center mb-10">
+      <h2 className="text-3xl font-bold text-base-content mb-4">
+        AI Analysis
+      </h2>
+      <p className="text-base-content/70 text-lg max-w-2xl mx-auto">
+        Here&apos;s what our AI discovered about your journal entry
+      </p>
+    </div>
+
+    <div className="grid gap-6 md:grid-cols-2">
+      {Object.entries(analysis).map(([key, value], index) => (
+        <div
+          key={key}
+          className={`card border-2 ${getAnalysisColor(
+            key
+          )} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}
+        >
+          <div className="card-body p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`p-2 rounded-lg bg-base-100 ${
+                    key === "summary"
+                      ? "text-gray-300"
+                      : key === "mood"
+                      ? "text-secondary"
+                      : key === "habits_and_patterns"
+                      ? "text-info"
+                      : key === "concerns"
+                      ? "text-warning"
+                      : key === "suggestions"
+                      ? "text-success"
+                      : "text-neutral"
+                  }`}
+                >
+                  {getAnalysisIcon(key)}
+                </div>
+                <h3 className="text-lg font-semibold text-base-content">
+                  {getAnalysisTitle(key)}
+                </h3>
+              </div>
+              <div className="badge badge-outline badge-sm">
+                {index + 1}
+              </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              {Object.entries(analysis).map(([key, value], index) => (
-                <div
-                  key={key}
-                  className={`card border-2 ${getAnalysisColor(key)} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}
-                >
-                  <div className="card-body p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg bg-base-100 ${
-                          key === 'summary' ? 'text-gray-300' :
-                          key === 'mood' ? 'text-secondary' :
-                          key === 'habits_and_patterns' ? 'text-info' :
-                          key === 'concerns' ? 'text-warning' :
-                          key === 'suggestions' ? 'text-success' :
-                          'text-neutral'
-                        }`}>
-                          {getAnalysisIcon(key)}
-                        </div>
-                        <h3 className="text-lg font-semibold text-base-content">
-                          {getAnalysisTitle(key)}
-                        </h3>
-                      </div>
-                      <div className="badge badge-outline badge-sm">
-                        {index + 1}
-                      </div>
-                    </div>
-                    
-                    {/* Card Content */}
-                    <p className="text-base-content/80 leading-relaxed">
-                      {value}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* 🔥 changed: Render lists for arrays, paragraphs for strings */}
+            {Array.isArray(value) ? (
+              <ul className="list-disc list-inside space-y-2 text-base-content/80">
+                {value.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-base-content/80 leading-relaxed">{value}</p>
+            )}
+            {/* 🔥 end changed */}
           </div>
-        )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
 
         {/* Call to Action Section - Made Smaller */}
         <div className="mt-12">
