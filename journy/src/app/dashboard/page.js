@@ -71,7 +71,6 @@ export default function DashboardPage() {
     } catch {}
   };
 
-
   const analyzeEntry = async () => {
     if (!entry.trim()) {
       alert("Please write something before analyzing!");
@@ -83,58 +82,43 @@ export default function DashboardPage() {
     setAnalysisError(null);
 
     try {
-      console.log('Sending request with entry:', entry.trim());
-      
-      const response = await fetch('/api/entries', {
-        method: 'POST',
+      console.log("Sending request with entry:", entry.trim());
+
+      const response = await fetch("/api/entries", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          entryText: entry.trim()
+          entryText: entry.trim(),
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      // Get the raw response text first
       const responseText = await response.text();
-      console.log('Raw response:', responseText);
+      if (!responseText) throw new Error("Empty response from server");
 
-      // Check if response is empty
-      if (!responseText) {
-        throw new Error('Empty response from server');
-      }
-
-      // Try to parse as JSON
       let data;
       try {
         data = JSON.parse(responseText);
       } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        console.error('Response text that failed to parse:', responseText);
-        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+        console.error("JSON parse error:", parseError);
+        throw new Error(
+          `Invalid JSON response: ${responseText.substring(0, 100)}...`
+        );
       }
 
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(data.error || `Server error: ${response.status}`);
-      }
+      if (!data.report || !data.entryId)
+        throw new Error("Missing report or entryId in response");
 
-      console.log('Parsed data:', data);
-
-      if (!data.report) {
-        throw new Error('No report data in response');
-      }
-
-      setAnalysisResult(data.report);
-      setShowAnalysis(true);
-      
-      // Save to localStorage as well
+      // Save entry locally
       saveEntry();
-      
+
+      // ✅ Redirect to insights page using entryId
+      window.location.href = `/insights/${data.entryId}`;
     } catch (error) {
-      console.error('Analysis error:', error);
+      console.error("Analysis error:", error);
       setAnalysisError(error.message);
     } finally {
       setIsAnalyzing(false);
@@ -242,10 +226,12 @@ export default function DashboardPage() {
                   </button>
                   <div className="text-xs text-base-content/60 text-center">
                     Word count:{" "}
-                    {entry
-                      .trim()
-                      .split(/\s+/)
-                      .filter((w) => w.length > 0).length}
+                    {
+                      entry
+                        .trim()
+                        .split(/\s+/)
+                        .filter((w) => w.length > 0).length
+                    }
                   </div>
                 </div>
               </div>
@@ -291,8 +277,8 @@ export default function DashboardPage() {
                   placeholder="Start writing your thoughts... What made today special? How are you feeling? What are you grateful for?"
                   aria-label="Daily journal entry"
                   style={{
-                    lineHeight: '1.75rem',
-                    backgroundAttachment: 'local',
+                    lineHeight: "1.75rem",
+                    backgroundAttachment: "local",
                   }}
                 />
 
@@ -348,7 +334,7 @@ export default function DashboardPage() {
                   <h3 className="font-bold">Analysis Failed</h3>
                   <div className="text-xs">{analysisError}</div>
                 </div>
-                <button 
+                <button
                   className="btn btn-sm btn-ghost"
                   onClick={() => setAnalysisError(null)}
                 >
@@ -378,7 +364,9 @@ export default function DashboardPage() {
                     {/* Summary */}
                     {analysisResult.summary && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-2 text-accent">Summary</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-accent">
+                          Summary
+                        </h3>
                         <p className="text-base-content/80 leading-relaxed">
                           {analysisResult.summary}
                         </p>
@@ -388,7 +376,9 @@ export default function DashboardPage() {
                     {/* Mood */}
                     {analysisResult.mood && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-2 text-accent">Mood Analysis</h3>
+                        <h3 className="text-lg font-semibold mb-2 text-accent">
+                          Mood Analysis
+                        </h3>
                         <div className="badge badge-secondary badge-lg">
                           {analysisResult.mood}
                         </div>
@@ -398,18 +388,27 @@ export default function DashboardPage() {
                     {/* Suggestions */}
                     {analysisResult.suggestions && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-3 text-accent">Suggestions</h3>
+                        <h3 className="text-lg font-semibold mb-3 text-accent">
+                          Suggestions
+                        </h3>
                         <div className="space-y-2">
                           {Array.isArray(analysisResult.suggestions) ? (
-                            analysisResult.suggestions.map((suggestion, index) => (
-                              <div key={index} className="flex items-start gap-3 p-3 bg-base-200 rounded-lg">
-                                <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0 mt-2"></div>
-                                <span className="text-sm">{suggestion}</span>
-                              </div>
-                            ))
+                            analysisResult.suggestions.map(
+                              (suggestion, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-start gap-3 p-3 bg-base-200 rounded-lg"
+                                >
+                                  <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0 mt-2"></div>
+                                  <span className="text-sm">{suggestion}</span>
+                                </div>
+                              )
+                            )
                           ) : (
                             <div className="p-3 bg-base-200 rounded-lg">
-                              <span className="text-sm">{analysisResult.suggestions}</span>
+                              <span className="text-sm">
+                                {analysisResult.suggestions}
+                              </span>
                             </div>
                           )}
                         </div>

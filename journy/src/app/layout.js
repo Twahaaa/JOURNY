@@ -26,9 +26,9 @@ export default function RootLayout({ children }) {
         },
       }}
     >
-       <html lang="en" data-theme="sunset">
+       <html lang="en" data-theme="luxury">
         <body
-          data-theme="sunset"
+          data-theme="luxury"
           className={`${barlow.variable} antialiased lg:flex min-h-screen`}
         >
           <UserProfile /> 

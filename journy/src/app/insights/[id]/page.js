@@ -13,6 +13,7 @@ export default function InsightsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
+
         const res = await fetch(`/api/entries?id=${params.id}`)
         if (!res.ok) throw new Error("Failed to fetch entry")
         const entryData = await res.json()
@@ -119,7 +120,6 @@ export default function InsightsPage() {
 
   return (
     <main data-theme="sunset" className="min-h-screen bg-base-100">
-      {/* Header Section */}
       <div className="border-b border-base-300">
         <div className="mx-auto max-w-5xl px-6 py-6">
           <button

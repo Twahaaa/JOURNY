@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main data-theme="sunset" className="min-h-dvh bg-base-100 text-base-content">
+    <main data-theme="luxury" className="min-h-dvh bg-base-100 text-base-content">
       {/* Header */}
       <header className="sticky top-0 z-40 backdrop-blur bg-base-100/80 border-b border-base-200">
         <nav className="navbar max-w-6xl mx-auto px-4">
