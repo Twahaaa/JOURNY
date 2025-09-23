@@ -34,7 +34,7 @@ export default function DashboardPage() {
       }, 0);
     } catch {}
     computeStats();
-  }, []);
+  }, [entry, todayKey]);
 
   const computeStats = () => {
     try {
