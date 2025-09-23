@@ -11,25 +11,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-
-      - name: Install dependencies
+      
+      - name: Install dependencies and build
         working-directory: ./journy
-        run: npm ci
-
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          OPEN_AI_ENDPOINT: ${{ secrets.OPEN_AI_ENDPOINT }}
+          OPEN_AI_MODEL: ${{ secrets.OPEN_AI_MODEL }}
+          OPEN_AI_DEPLOYMENT_NAME: ${{ secrets.OPEN_AI_DEPLOYMENT_NAME }}
+          OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+        run: |
+          npm ci
+          npm run build --if-present
+      
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: express-app
           path: |
-            journy/index.js
-            journy/node_modules
-            journy/package.json
-            journy/package-lock.json
+            journy/
+            !journy/node_modules
 
   release:
     runs-on: ubuntu-latest
@@ -37,25 +45,33 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: express-app
           path: ./journy
-
+      
+      - name: Set up Node.js for deployment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      
+      - name: Install production dependencies
+        working-directory: ./journy
+        run: npm ci --only=production
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_95CFC3610C814F7CBBF816F229673EEA }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DD7BC93F069F4C5E818C8A574BB3D075 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7EA2BFEFDCEB421F85E8F1A63711B4A7 }}
-
+      
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'SignFlix-prod'
+          app-name: 'jouny'
           slot-name: 'Production'
           package: ./journy
