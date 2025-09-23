@@ -51,7 +51,6 @@ export default function HistoryPage() {
       className="min-h-screen bg-gradient-to-br from-base-200 to-base-300 text-base-content"
     >
       <div className="mx-auto max-w-7xl px-4 py-6 md:py-10">
-        {/* Header */}
         <header className="mb-8 text-center">
           <h1 className="text-pretty text-2xl font-bold text-base-content md:text-3xl mb-2">
             Past Reflections
@@ -92,14 +91,14 @@ export default function HistoryPage() {
                 
                 <div className="form-control mb-4">
                   <label className="label">
-                    <span className="label-text">Search entries</span>
+                    <span className="label-text mb-3">Search entries</span>
                   </label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-base-content/60" />
+                    <Search className="absolute left-3 top-1/2 text-white transform -translate-y-1/2 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Search content..."
-                      className="input input-bordered w-full pl-10"
+                      className="input input-bordered w-full pl-8"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -145,7 +144,6 @@ export default function HistoryPage() {
                         {truncateContent(entry.content || "")}
                       </p>
 
-                      {/* Footer */}
                       <div className="flex items-center justify-end mt-6 pt-4 border-t border-base-300">
                         <button className="btn btn-ghost btn-sm group-hover:btn-accent group-hover:text-accent-content transition-colors">
                           Read More 
