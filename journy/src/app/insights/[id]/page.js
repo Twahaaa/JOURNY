@@ -161,7 +161,7 @@ Moving forward, I want to embrace uncertainty with more courage and approach dif
           <div className="text-center py-16">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-base-content/40" />
             <h2 className="text-2xl font-bold text-base-content mb-2">Entry Not Found</h2>
-            <p className="text-base-content/70 mb-6">The journal entry you're looking for doesn't exist.</p>
+            <p className="text-base-content/70 mb-6">The journal entry you&apos;re looking for doesn&apos;t exist.</p>
             <button 
               className="btn btn-accent"
               onClick={() => router.push('/history')}

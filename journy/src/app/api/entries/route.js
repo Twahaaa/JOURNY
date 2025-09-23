@@ -1,3 +1,4 @@
+"use server";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";

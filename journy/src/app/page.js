@@ -1,3 +1,5 @@
+"use client";
+
 export default function HomePage() {
   return (
     <main data-theme="sunset" className="min-h-dvh bg-base-100 text-base-content">

@@ -85,7 +85,7 @@ export default function DashboardPage() {
     try {
       console.log('Sending request with entry:', entry.trim());
       
-      const response = await fetch('/api/analyze-entry', {
+      const response = await fetch('/api/entries', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
