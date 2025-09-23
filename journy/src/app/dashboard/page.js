@@ -22,19 +22,18 @@ export default function DashboardPage() {
   const [savedAt, setSavedAt] = useState(null);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [totalEntries, setTotalEntries] = useState(0);
-  const containerRef = useRef(null);
 
+  // This effect now runs only ONCE when the component mounts to load initial data.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(todayKey);
-      if (saved) setEntry(saved);
-      setTimeout(() => {
-        if (containerRef.current && saved)
-          containerRef.current.innerText = saved;
-      }, 0);
+      if (saved) {
+        setEntry(saved);
+      }
     } catch {}
+    // We compute stats once on load.
     computeStats();
-  }, [entry, todayKey]);
+  }, [todayKey]); // Depends only on todayKey, which is stable.
 
   const computeStats = () => {
     try {
@@ -66,12 +65,16 @@ export default function DashboardPage() {
     } catch {}
   };
 
+  // This effect handles autosaving and is correct.
   useEffect(() => {
     const id = setTimeout(() => {
-      try {
-        localStorage.setItem(todayKey, entry);
-        setSavedAt(new Date());
-      } catch {}
+      // Avoid saving an empty string unnecessarily on initial load
+      if (entry) {
+        try {
+          localStorage.setItem(todayKey, entry);
+          setSavedAt(new Date());
+        } catch {}
+      }
     }, 600);
     return () => clearTimeout(id);
   }, [entry, todayKey]);
@@ -147,8 +150,7 @@ export default function DashboardPage() {
                     onClick={() => {
                       if (confirm("Clear today's entry?")) {
                         setEntry("");
-                        if (containerRef.current)
-                          containerRef.current.innerText = "";
+                        // We don't need to manually clear the textarea. React does it.
                         try {
                           localStorage.removeItem(todayKey);
                           computeStats();
@@ -160,12 +162,10 @@ export default function DashboardPage() {
                   </button>
                   <div className="text-xs text-base-content/60 text-center">
                     Word count:{" "}
-                    {
-                      entry
-                        .trim()
-                        .split(/\s+/)
-                        .filter((w) => w.length > 0).length
-                    }
+                    {entry
+                      .trim()
+                      .split(/\s+/)
+                      .filter((w) => w.length > 0).length}
                   </div>
                 </div>
               </div>
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <textarea
-                  ref={containerRef}
+                  // No ref is needed now for setting text
                   value={entry}
                   onChange={(e) => setEntry(e.target.value)}
                   className="w-full h-96 resize-none text-base leading-7 border-none outline-none focus:outline-none focus:ring-0 text-gray-400 p-4 rounded-lg bg-gray-600/20"
