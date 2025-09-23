@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
       }}
     >
       <html lang="en" data-theme="luxury">
-        <body className={`${barlow.variable} antialiased `}>
+        <body className={`${barlow.variable} antialiased`}>
           <SidebarWrapper>{children}</SidebarWrapper>
           <UserProfile />
         </body>

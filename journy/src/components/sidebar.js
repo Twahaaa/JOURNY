@@ -65,8 +65,7 @@ const NavigationSidebar = ({ children }) => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : ''}`}>
+      <div className={`flex-1 min-h-screen transition-all duration-300 md:pl-60 ${sidebarOpen ? 'lg:ml-72 ' : ''}`}>
         {children}
       </div>
 
