@@ -1,7 +1,19 @@
 "use client";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/dashboard");
+    }
+  }, [isLoaded, isSignedIn, router]);
   return (
     <main data-theme="luxury" className="min-h-dvh bg-base-100 text-base-content">
       {/* Header */}
@@ -14,9 +26,15 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="flex-none gap-2">
-            <Link href="/sign-up" className="btn btn-primary">
-              Get started
-            </Link>
+            {isLoaded && isSignedIn ? (
+              <Link href="/dashboard" className="btn btn-primary">
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link href="/sign-up" className="btn btn-primary">
+                Get started
+              </Link>
+            )}
           </div>
         </nav>
       </header>
@@ -32,9 +50,15 @@ export default function HomePage() {
               they ever touch our database—only you hold the keys.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/sign-up" className="btn btn-primary">
-                Start journaling
-              </Link>
+              {isLoaded && isSignedIn ? (
+                <Link href="/dashboard" className="btn btn-primary">
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <Link href="/sign-up" className="btn btn-primary">
+                  Start journaling
+                </Link>
+              )}
               <a href="#security" className="btn btn-outline">
                 How encryption works
               </a>
@@ -275,7 +299,11 @@ export default function HomePage() {
             <h3 className="card-title text-2xl md:text-3xl">Start your private journal today</h3>
             <p className="opacity-80">Create a space that’s truly yours—secure, calming, and always in your control.</p>
             <div className="card-actions">
-              <Link className="btn btn-primary" href="/sign-up">Create my account</Link>
+              {isLoaded && isSignedIn ? (
+                <Link className="btn btn-primary" href="/dashboard">Go to Dashboard</Link>
+              ) : (
+                <Link className="btn btn-primary" href="/sign-up">Create my account</Link>
+              )}
               <Link className="btn btn-outline" href="#security">
                 Learn about security
               </Link>
