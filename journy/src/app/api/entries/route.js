@@ -127,41 +127,44 @@ export async function POST(req) {
   }
 }
 
-export async function GET(req) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  try {
-    // Connect to the database
-    await connectToDb();
-
-    // Fetch all entries for the user. Sorting is done in the app layer
-    // as a workaround for the Cosmos DB indexing error.
-    const unsorted_entries = await JournalEntry.find({ userId: userId });
-
-    // Manually sort the entries by date in descending order.
-    const all_entries = unsorted_entries.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-
-    return NextResponse.json(all_entries);
-  } catch (error) {
-    console.error("Error fetching entries:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Failed to fetch entries." }),
-      {
-        status: 500,
+  export async function GET() {
+    const { userId } = await auth();
+  
+    if (!userId) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
         headers: { "Content-Type": "application/json" },
-      }
-    );
+      });
+    }
+  
+    try {
+      // Connect to the database
+      await connectToDb();
+  
+      // Fetch all entries for the user. Sorting is done in the app layer
+      // as a workaround for the Cosmos DB indexing error.
+      const unsorted_entries = await JournalEntry.find({ userId: userId });
+  
+      // Manually sort the entries by date in descending order.
+      const all_entries = unsorted_entries.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+  
+      return NextResponse.json(all_entries);
+    } catch (error) {
+      console.error("Error fetching entries:", error);
+      return new NextResponse(
+        JSON.stringify({ error: "Failed to fetch entries." }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
   }
-}
+  
+
+
 
 export async function DELETE(req) {
   const { userId } = await auth();

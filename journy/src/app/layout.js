@@ -2,6 +2,7 @@ import { Barlow } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark, neobrutalism } from "@clerk/themes";
+import UserProfile from "@/components/UserProfile";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -25,11 +26,12 @@ export default function RootLayout({ children }) {
         },
       }}
     >
-      <html lang="en" data-theme="luxury">
+       <html lang="en" data-theme="sunset">
         <body
-          data-theme="luxury"
+          data-theme="sunset"
           className={`${barlow.variable} antialiased lg:flex min-h-screen`}
         >
+          <UserProfile /> 
           <main className="flex-1">{children}</main>
         </body>
       </html>
