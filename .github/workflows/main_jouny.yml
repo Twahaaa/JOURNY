@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the repo
+      # 1️⃣ Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -21,17 +21,25 @@ jobs:
         with:
           node-version: '20.x'
 
-      # 3️⃣ Install dependencies in the nested folder
+      # 3️⃣ Install dependencies
       - name: Install dependencies
-        working-directory: ./journy
-        run: npm ci
+        run: |
+          cd journy
+          npm ci
 
       # 4️⃣ Build the Next.js app
       - name: Build Next.js
-        working-directory: ./journy
-        run: npm run build
+        run: |
+          cd journy
+          npm run build
 
-      # 5️⃣ Login to Azure
+      # 5️⃣ Archive the app for deployment
+      - name: Archive app
+        run: |
+          cd journy
+          zip -r ../nextjs-app.zip .
+
+      # 6️⃣ Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -39,9 +47,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # 6️⃣ Deploy to Azure Web App
+      # 7️⃣ Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'signflix-redirect'  # replace with your actual App Service name
-          package: ./journy              # points to the nested Next.js folder
+          app-name: 'signflix-redirect'  # must exactly match your Azure App Service
+          package: nextjs-app.zip
