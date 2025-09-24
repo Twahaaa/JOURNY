@@ -70,7 +70,7 @@ jobs:
         with:
           app-name: 'jounry'
           slot-name: 'Production'
-          package: .
+          package: journy
 
           
 
