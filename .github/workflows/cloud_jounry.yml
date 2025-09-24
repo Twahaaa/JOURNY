@@ -15,27 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'npm'
-          cache-dependency-path: ./journy/package-lock.json
-
-      - name: Install dependencies and build
-        env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          OPEN_AI_ENDPOINT: ${{ secrets.OPEN_AI_ENDPOINT }}
-          OPEN_AI_MODEL: ${{ secrets.OPEN_AI_MODEL }}
-          OPEN_AI_DEPLOYMENT_NAME: ${{ secrets.OPEN_AI_DEPLOYMENT_NAME }}
-          OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-        working-directory: ./journy
-        run: |
-          npm ci
-          npm run build
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -69,3 +48,11 @@ jobs:
           app-name: 'jounry'
           slot-name: 'Production'
           package: ./journy
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          OPEN_AI_ENDPOINT: ${{ secrets.OPEN_AI_ENDPOINT }}
+          OPEN_AI_MODEL: ${{ secrets.OPEN_AI_MODEL }}
+          OPEN_AI_DEPLOYMENT_NAME: ${{ secrets.OPEN_AI_DEPLOYMENT_NAME }}
+          OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
