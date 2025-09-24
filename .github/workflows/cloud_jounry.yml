@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - jounry
+name: Build and deploy Node.js app to Azure Web App - journy
 
 on:
   push:
@@ -24,6 +24,15 @@ jobs:
           node-version: '22.x'
 
       - name: npm install, build, and test
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          OPEN_AI_ENDPOINT: ${{ secrets.OPEN_AI_ENDPOINT }}
+          OPEN_AI_MODEL: ${{ secrets.OPEN_AI_MODEL }}
+          OPEN_AI_DEPLOYMENT_NAME: ${{ secrets.OPEN_AI_DEPLOYMENT_NAME }}
+          OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+        working-directory: ./journy
         run: |
           npm install
           npm run build --if-present
@@ -51,15 +60,16 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5683F3801E704E079E344F36FF858E29 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B0F9E7C62C31451DBB90C176921DAFD5 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4C4F0E53555A4726A9817A3C9A618785 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_83E3A747570340FE9F3B07D4614A3C09 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E24193E7B9424B04B9EF73858335E610 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0482A371822741D1BA202ABD0D9F2371 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'jounry'
+          app-name: 'journy'
           slot-name: 'Production'
           package: .
+
           
