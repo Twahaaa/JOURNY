@@ -6,7 +6,7 @@ name: Build and deploy Node.js app to Azure Web App - journy
 on:
   push:
     branches:
-      - main
+      - cloud
   workflow_dispatch:
 
 jobs:
