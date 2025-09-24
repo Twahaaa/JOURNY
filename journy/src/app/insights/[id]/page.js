@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { ArrowLeft, BookOpen, Smile, TrendingUp, Brain, AlertTriangle, Lightbulb, Calendar, Clock, Sparkles, FileText } from "lucide-react"
+import { ArrowLeft, BookOpen, Sparkles, Calendar, Clock, FileText, Brain, AlertTriangle, Lightbulb } from "lucide-react"
 
 export default function InsightsPage() {
   const router = useRouter()
@@ -13,14 +13,13 @@ export default function InsightsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-
         const res = await fetch(`/api/entries?id=${params.id}`)
         if (!res.ok) throw new Error("Failed to fetch entry")
         const entryData = await res.json()
-        console.log(res);
-        console.log(entryData);
         setEntry(entryData)
-        setAnalysis(entryData.analysis) 
+        // Remove mood key if exists
+        const { mood, ...restAnalysis } = entryData.analysis || {}
+        setAnalysis(restAnalysis) 
       } catch (err) {
         console.error(err)
       } finally {
@@ -52,7 +51,6 @@ export default function InsightsPage() {
     const iconClass = "w-5 h-5"
     switch(type) {
       case "summary": return <FileText className={iconClass} />
-      case "mood": return <Smile className={iconClass} />
       case "habits_and_patterns": return <Brain className={iconClass} />
       case "concerns": return <AlertTriangle className={iconClass} />
       case "suggestions": return <Lightbulb className={iconClass} />
@@ -63,7 +61,6 @@ export default function InsightsPage() {
   const getAnalysisColor = (type) => {
     switch(type) {
       case "summary": return "border-secondary/20 bg-warning/5"
-      case "mood": return "border-secondary/20 bg-secondary/5"
       case "habits_and_patterns": return "border-info/20 bg-info/5"  
       case "concerns": return "border-warning/20 bg-warning/5"
       case "suggestions": return "border-success/20 bg-success/5"
@@ -74,7 +71,6 @@ export default function InsightsPage() {
   const getAnalysisTitle = (type) => {
     switch(type) {
       case "summary": return "Summary"
-      case "mood": return "Mood"
       case "habits_and_patterns": return "Habits & Patterns"
       case "concerns": return "Concerns"
       case "suggestions": return "Suggestions"
@@ -179,86 +175,78 @@ export default function InsightsPage() {
           </div>
         </div>
 
-{/* Analysis Section */}
-{analysis && (
-  <div>
-    <div className="text-center mb-10">
-      <h2 className="text-3xl font-bold text-base-content mb-4">
-        AI Analysis
-      </h2>
-      <p className="text-base-content/70 text-lg max-w-2xl mx-auto">
-        Here&apos;s are some insights discovered from your journal entry
-      </p>
-    </div>
-
-    <div className="grid gap-6 md:grid-cols-2">
-      {Object.entries(analysis).map(([key, value], index) => (
-        <div
-          key={key}
-          className={`card border-2 ${getAnalysisColor(
-            key
-          )} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}
-        >
-          <div className="card-body p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-2 rounded-lg bg-base-100 ${
-                    key === "summary"
-                      ? "text-gray-300"
-                      : key === "mood"
-                      ? "text-secondary"
-                      : key === "habits_and_patterns"
-                      ? "text-info"
-                      : key === "concerns"
-                      ? "text-warning"
-                      : key === "suggestions"
-                      ? "text-success"
-                      : "text-neutral"
-                  }`}
-                >
-                  {getAnalysisIcon(key)}
-                </div>
-                <h3 className="text-lg font-semibold text-base-content">
-                  {getAnalysisTitle(key)}
-                </h3>
-              </div>
-              <div className="badge badge-outline badge-sm">
-                {index + 1}
-              </div>
+        {/* Analysis Section */}
+        {analysis && (
+          <div>
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-base-content mb-4">
+                AI Analysis
+              </h2>
+              <p className="text-base-content/70 text-lg max-w-2xl mx-auto">
+                Here&apos;s are some insights discovered from your journal entry
+              </p>
             </div>
 
-              {/* 🔥 Render lists for arrays/objects, paragraph for strings */}
-              {Array.isArray(value) ? (
-                <ul className="list-disc list-inside space-y-2 text-base-content/80">
-                  {value.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              ) : typeof value === "object" && value !== null ? (
-                <ul className="list-disc list-inside space-y-2 text-base-content/80">
-                  {Object.entries(value).map(([k, v], i) => (
-                    <li key={i}>
-                      <span className="font-medium">{k.replace(/_/g, " ")}:</span> {v}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-base-content/80 leading-relaxed">{value}</p>
-              )}
+            <div className="grid gap-6 md:grid-cols-2">
+              {Object.entries(analysis).map(([key, value], index) => (
+                <div
+                  key={key}
+                  className={`card border-2 ${getAnalysisColor(key)} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}
+                >
+                  <div className="card-body p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`p-2 rounded-lg bg-base-100 ${
+                            key === "summary"
+                              ? "text-gray-300"
+                              : key === "habits_and_patterns"
+                              ? "text-info"
+                              : key === "concerns"
+                              ? "text-warning"
+                              : key === "suggestions"
+                              ? "text-success"
+                              : "text-neutral"
+                          }`}
+                        >
+                          {getAnalysisIcon(key)}
+                        </div>
+                        <h3 className="text-lg font-semibold text-base-content">
+                          {getAnalysisTitle(key)}
+                        </h3>
+                      </div>
+                      <div className="badge badge-outline badge-sm">
+                        {index + 1}
+                      </div>
+                    </div>
 
-            {/* 🔥 end changed */}
+                    {Array.isArray(value) ? (
+                      <ul className="list-disc list-inside space-y-2 text-base-content/80">
+                        {value.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : typeof value === "object" && value !== null ? (
+                      <ul className="list-disc list-inside space-y-2 text-base-content/80">
+                        {Object.entries(value).map(([k, v], i) => (
+                          <li key={i}>
+                            <span className="font-medium">{k.replace(/_/g, " ")}:</span> {v}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-base-content/80 leading-relaxed">{value}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+        )}
 
-
-        {/* Call to Action Section - Made Smaller */}
+        {/* Call to Action Section */}
         <div className="mt-12">
-          <div className="card  border border-primary/10">
+          <div className="card border border-primary/10">
             <div className="card-body text-center p-6">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <Lightbulb className="w-6 h-6 text-gray-300" />

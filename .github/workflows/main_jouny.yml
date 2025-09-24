@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - SignFlix-redirect
+name: Build and Deploy Next.js to Azure Web App
 
 on:
   push:
@@ -7,61 +7,41 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+    steps:
+      # 1️⃣ Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
+      # 3️⃣ Install dependencies in the nested folder
       - name: Install dependencies
-        env: 
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          OPEN_AI_ENDPOINT: ${{ secrets.OPEN_AI_ENDPOINT }}
-          OPEN_AI_MODEL: ${{ secrets.OPEN_AI_MODEL }}
-          OPEN_AI_DEPLOYMENT_NAME: ${{ secrets.OPEN_AI_DEPLOYMENT_NAME }}
-          OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-
         working-directory: ./journy
         run: npm ci
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: express-app
-          path: |
-            journy/
+      # 4️⃣ Build the Next.js app
+      - name: Build Next.js
+        working-directory: ./journy
+        run: npm run build
 
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: express-app
-          path: .
-
+      # 5️⃣ Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_95CFC3610C814F7CBBF816F229673EEA }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DD7BC93F069F4C5E818C8A574BB3D075 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7EA2BFEFDCEB421F85E8F1A63711B4A7 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # 6️⃣ Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
-          app-name: 'jouny'
-          # slot-name: 'Production'
-          package: .
+          app-name: 'signflix-redirect'  # replace with your actual App Service name
+          package: ./journy              # points to the nested Next.js folder
