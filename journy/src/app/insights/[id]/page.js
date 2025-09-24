@@ -228,16 +228,25 @@ export default function InsightsPage() {
               </div>
             </div>
 
-            {/* 🔥 changed: Render lists for arrays, paragraphs for strings */}
-            {Array.isArray(value) ? (
-              <ul className="list-disc list-inside space-y-2 text-base-content/80">
-                {value.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-base-content/80 leading-relaxed">{value}</p>
-            )}
+              {/* 🔥 Render lists for arrays/objects, paragraph for strings */}
+              {Array.isArray(value) ? (
+                <ul className="list-disc list-inside space-y-2 text-base-content/80">
+                  {value.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              ) : typeof value === "object" && value !== null ? (
+                <ul className="list-disc list-inside space-y-2 text-base-content/80">
+                  {Object.entries(value).map(([k, v], i) => (
+                    <li key={i}>
+                      <span className="font-medium">{k.replace(/_/g, " ")}:</span> {v}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-base-content/80 leading-relaxed">{value}</p>
+              )}
+
             {/* 🔥 end changed */}
           </div>
         </div>
